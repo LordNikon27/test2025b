@@ -667,10 +667,10 @@
       
       const payloads = [
         '', 'null', 'undefined', '0', '1', '-1', 'true', 'false',
-        'test', '../../../etc/passwd', '<script>alert(1)</script>',
+        'test', '../../../etc/passwd', '<script>alert(1)<\/script>',
         'javascript:alert(1)', 'file:///etc/passwd',
         '{"test": "value"}', '[1,2,3]', 'function(){return 1;}',
-        '%00', '%2e%2e%2f', '\\x00', '\\n\\r\\t'
+        '%00', '%2e%2e%2f', String.fromCharCode(0), String.fromCharCode(10, 13, 9)
       ];
 
       if (window.external) {

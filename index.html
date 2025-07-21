@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body { font-family: sans-serif; padding: 1rem; background: #f9f9f9; }
-    textarea, input, button { width: 100%; padding: 0.5rem; margin: 0.3rem 0; font-size: 1rem; }
+    textarea, input, button { width: 100%; padding: 0.5rem; margin: 0.3rem 0; font-size: 1rem; box-sizing: border-box; }
     .log { background: #222; color: #0f0; padding: 1rem; font-family: monospace; white-space: pre-wrap; height: 250px; overflow-y: auto; border-radius: 6px; }
     h2 { margin-top: 1.8rem; }
     button { cursor: pointer; }
@@ -24,6 +24,17 @@
     #reloadBtn:hover {
       background-color: #0056b3;
     }
+    .test-section {
+      background: white;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 8px;
+      border-left: 4px solid #007bff;
+    }
+    .status { font-weight: bold; }
+    .success { color: #28a745; }
+    .warning { color: #ffc107; }
+    .error { color: #dc3545; }
   </style>
 </head>
 <body>
@@ -32,36 +43,83 @@
 
   <h1>🔍 WebView Advanced Security Test</h1>
 
-  <h2>🧠 Ambiente</h2>
-  <p><strong>User-Agent:</strong> <span id="ua"></span></p>
-  <p><strong>Cookie:</strong> <span id="cookie"></span></p>
+  <div class="test-section">
+    <h2>🧠 Informazioni Ambiente</h2>
+    <p><strong>User-Agent:</strong> <span id="ua"></span></p>
+    <p><strong>Cookie:</strong> <span id="cookie"></span></p>
+    <p><strong>Referrer:</strong> <span id="referrer"></span></p>
+    <p><strong>Origin:</strong> <span id="origin"></span></p>
+    <p><strong>Protocol:</strong> <span id="protocol"></span></p>
+  </div>
 
-  <h2>🛠 JavaScript Bridge Check</h2>
-  <ul>
-    <li id="bridge-android">window.Android: <em>checking...</em></li>
-    <li id="bridge-cordova">window.cordova: <em>checking...</em></li>
-    <li id="bridge-capacitor">window.Capacitor: <em>checking...</em></li>
-    <li id="bridge-plugins">window.plugins: <em>checking...</em></li>
-  </ul>
+  <div class="test-section">
+    <h2>🛠 JavaScript Bridge Detection</h2>
+    <ul>
+      <li id="bridge-android">window.Android: <em>checking...</em></li>
+      <li id="bridge-cordova">window.cordova: <em>checking...</em></li>
+      <li id="bridge-capacitor">window.Capacitor: <em>checking...</em></li>
+      <li id="bridge-plugins">window.plugins: <em>checking...</em></li>
+      <li id="bridge-webkit">window.webkit: <em>checking...</em></li>
+      <li id="bridge-external">window.external: <em>checking...</em></li>
+    </ul>
+  </div>
 
-  <h2>⌨️ Keylogger Test</h2>
-  <input type="text" placeholder="Inserisci un finto numero carta" />
-  <input type="password" placeholder="Esempio campo password" />
+  <div class="test-section">
+    <h2>⌨️ Input Monitoring Test</h2>
+    <input type="text" placeholder="Test campo testo normale" id="textInput" />
+    <input type="password" placeholder="Test campo password" id="passwordInput" />
+    <input type="email" placeholder="test@example.com" id="emailInput" />
+    <input type="tel" placeholder="+39 123 456 7890" id="phoneInput" />
+    <textarea placeholder="Test textarea per testo lungo" id="textareaInput"></textarea>
+  </div>
 
-  <h2>🌍 Fetch Test (CORS)</h2>
-  <div id="cors-result">In attesa risposta da https://example.com...</div>
+  <div class="test-section">
+    <h2>🌍 Network & CORS Test</h2>
+    <div id="cors-result">Testing fetch to https://httpbin.org/get...</div>
+    <button id="testXHR">Test XMLHttpRequest</button>
+    <button id="testWebSocket">Test WebSocket</button>
+    <div id="network-results"></div>
+  </div>
 
-  <h2>📍 Test Posizione (Geolocation)</h2>
-  <button id="btnGetPosition">Richiedi posizione</button>
+  <div class="test-section">
+    <h2>📱 Device API Tests</h2>
+    <button id="btnGetPosition">🌍 Test Geolocation</button>
+    <button id="btnTestCamera">📷 Test Camera Access</button>
+    <button id="btnTestMicrophone">🎤 Test Microphone</button>
+    <button id="btnTestNotification">🔔 Test Notifications</button>
+    <button id="btnTestVibration">📳 Test Vibration</button>
+    <div id="device-results"></div>
+  </div>
 
-  <h2>📜 Console Log</h2>
-  <div class="log" id="log">Log in esecuzione...</div>
+  <div class="test-section">
+    <h2>🗄️ Storage Tests</h2>
+    <button id="btnTestLocalStorage">Test LocalStorage</button>
+    <button id="btnTestSessionStorage">Test SessionStorage</button>
+    <button id="btnTestIndexedDB">Test IndexedDB</button>
+    <button id="btnTestWebSQL">Test WebSQL</button>
+    <div id="storage-results"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>🔒 Security Tests</h2>
+    <button id="btnTestCSP">Test Content Security Policy</button>
+    <button id="btnTestEval">Test eval() execution</button>
+    <button id="btnTestInlineScript">Test inline script injection</button>
+    <button id="btnTestFrameOptions">Test iframe loading</button>
+    <div id="security-results"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>📜 Console Log</h2>
+    <div class="log" id="log">Log in esecuzione...</div>
+  </div>
 
   <script>
     const logElem = document.getElementById('log');
     function log(...args) {
+      const timestamp = new Date().toLocaleTimeString();
       const out = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : a).join(' ');
-      logElem.textContent += '\n' + out;
+      logElem.textContent += `\n[${timestamp}] ${out}`;
       logElem.scrollTop = logElem.scrollHeight;
       console.log(...args);
     }
@@ -71,59 +129,108 @@
       location.reload();
     });
 
-    // Mostra user agent e cookie
+    // Informazioni ambiente
     document.getElementById('ua').textContent = navigator.userAgent;
     document.getElementById('cookie').textContent = document.cookie || "(nessuno)";
+    document.getElementById('referrer').textContent = document.referrer || "(nessuno)";
+    document.getElementById('origin').textContent = window.location.origin;
+    document.getElementById('protocol').textContent = window.location.protocol;
 
-    // Check bridge Android
-    if (window.Android) {
-      document.getElementById('bridge-android').textContent = "window.Android: ✅ presente";
-      log("window.Android rilevato:", window.Android);
-    } else {
-      document.getElementById('bridge-android').textContent = "window.Android: ❌ assente";
-    }
+    // Bridge detection
+    const bridges = [
+      { name: 'Android', obj: 'window.Android', id: 'bridge-android' },
+      { name: 'cordova', obj: 'window.cordova', id: 'bridge-cordova' },
+      { name: 'Capacitor', obj: 'window.Capacitor', id: 'bridge-capacitor' },
+      { name: 'plugins', obj: 'window.plugins', id: 'bridge-plugins' },
+      { name: 'webkit', obj: 'window.webkit', id: 'bridge-webkit' },
+      { name: 'external', obj: 'window.external', id: 'bridge-external' }
+    ];
 
-    // Check Cordova
-    if (window.cordova) {
-      document.getElementById('bridge-cordova').textContent = "window.cordova: ✅ presente";
-      log("window.cordova rilevato:", window.cordova);
-    } else {
-      document.getElementById('bridge-cordova').textContent = "window.cordova: ❌ assente";
-    }
+    bridges.forEach(bridge => {
+      const obj = eval(bridge.obj);
+      const elem = document.getElementById(bridge.id);
+      if (obj) {
+        elem.innerHTML = `${bridge.obj}: <span class="status success">✅ presente</span>`;
+        log(`${bridge.obj} rilevato:`, obj);
+        // Prova a chiamare metodi se esistono
+        try {
+          if (typeof obj === 'object' && obj.constructor) {
+            log(`${bridge.obj} constructor:`, obj.constructor.name);
+          }
+        } catch (e) {
+          log(`Errore nell'analisi di ${bridge.obj}:`, e);
+        }
+      } else {
+        elem.innerHTML = `${bridge.obj}: <span class="status error">❌ assente</span>`;
+      }
+    });
 
-    // Check Capacitor
-    if (window.Capacitor) {
-      document.getElementById('bridge-capacitor').textContent = "window.Capacitor: ✅ presente";
-      log("window.Capacitor rilevato:", window.Capacitor);
-    } else {
-      document.getElementById('bridge-capacitor').textContent = "window.Capacitor: ❌ assente";
-    }
-
-    // Check plugins
-    if (window.plugins) {
-      document.getElementById('bridge-plugins').textContent = "window.plugins: ✅ presente";
-      log("window.plugins rilevato:", window.plugins);
-    } else {
-      document.getElementById('bridge-plugins').textContent = "window.plugins: ❌ assente";
-    }
-
-    // Keylogger base
-    document.querySelectorAll('input').forEach(el => {
+    // Input monitoring
+    ['textInput', 'passwordInput', 'emailInput', 'phoneInput', 'textareaInput'].forEach(id => {
+      const el = document.getElementById(id);
       el.addEventListener('input', (e) => {
-        log(`Input digitato (${e.target.type}):`, e.target.value);
+        log(`Input digitato (${e.target.type || 'textarea'}):`, e.target.value);
+      });
+      el.addEventListener('focus', (e) => {
+        log(`Focus su campo:`, e.target.id);
+      });
+      el.addEventListener('blur', (e) => {
+        log(`Blur da campo:`, e.target.id);
       });
     });
 
-    // Fetch cross-origin test
-    fetch("https://example.com", { method: "GET" })
-      .then(r => {
-        document.getElementById('cors-result').textContent = `✅ Risposta fetch: ${r.status}`;
-        log('Risposta fetch:', r);
+    // Network tests
+    fetch("https://httpbin.org/get", { 
+      method: "GET",
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('cors-result').innerHTML = `<span class="status success">✅ Fetch successful</span>`;
+        log('Fetch response:', data);
       })
       .catch(e => {
-        document.getElementById('cors-result').textContent = `❌ Errore fetch: ${e}`;
-        log('Errore fetch:', e);
+        document.getElementById('cors-result').innerHTML = `<span class="status error">❌ Fetch error: ${e.message}</span>`;
+        log('Fetch error:', e);
       });
+
+    // XMLHttpRequest test
+    document.getElementById('testXHR').addEventListener('click', () => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', 'https://httpbin.org/user-agent');
+      xhr.onload = () => {
+        log('XHR response:', xhr.responseText);
+        document.getElementById('network-results').innerHTML += '<div>XHR: ✅ Success</div>';
+      };
+      xhr.onerror = (e) => {
+        log('XHR error:', e);
+        document.getElementById('network-results').innerHTML += '<div>XHR: ❌ Error</div>';
+      };
+      xhr.send();
+    });
+
+    // WebSocket test
+    document.getElementById('testWebSocket').addEventListener('click', () => {
+      try {
+        const ws = new WebSocket('wss://echo.websocket.org/');
+        ws.onopen = () => {
+          log('WebSocket opened');
+          ws.send('Test message');
+          document.getElementById('network-results').innerHTML += '<div>WebSocket: ✅ Connected</div>';
+        };
+        ws.onmessage = (e) => {
+          log('WebSocket message:', e.data);
+          ws.close();
+        };
+        ws.onerror = (e) => {
+          log('WebSocket error:', e);
+          document.getElementById('network-results').innerHTML += '<div>WebSocket: ❌ Error</div>';
+        };
+      } catch (e) {
+        log('WebSocket creation error:', e);
+        document.getElementById('network-results').innerHTML += '<div>WebSocket: ❌ Creation Error</div>';
+      }
+    });
 
     // Geolocation test
     document.getElementById('btnGetPosition').addEventListener('click', () => {
@@ -134,19 +241,175 @@
       navigator.geolocation.getCurrentPosition(
         pos => {
           log("📍 Posizione ottenuta:", pos.coords);
-          alert(`Posizione: Lat ${pos.coords.latitude}, Lon ${pos.coords.longitude}`);
+          document.getElementById('device-results').innerHTML += '<div>Geolocation: ✅ Granted</div>';
         },
         err => {
           log("❌ Errore posizione:", err);
-          alert(`Errore posizione: ${err.message}`);
+          document.getElementById('device-results').innerHTML += '<div>Geolocation: ❌ Denied</div>';
         }
       );
+    });
+
+    // Camera test
+    document.getElementById('btnTestCamera').addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        log('📷 Camera access granted');
+        document.getElementById('device-results').innerHTML += '<div>Camera: ✅ Granted</div>';
+        stream.getTracks().forEach(track => track.stop()); // Stop stream
+      } catch (e) {
+        log('❌ Camera access denied:', e);
+        document.getElementById('device-results').innerHTML += '<div>Camera: ❌ Denied</div>';
+      }
+    });
+
+    // Microphone test
+    document.getElementById('btnTestMicrophone').addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        log('🎤 Microphone access granted');
+        document.getElementById('device-results').innerHTML += '<div>Microphone: ✅ Granted</div>';
+        stream.getTracks().forEach(track => track.stop()); // Stop stream
+      } catch (e) {
+        log('❌ Microphone access denied:', e);
+        document.getElementById('device-results').innerHTML += '<div>Microphone: ❌ Denied</div>';
+      }
+    });
+
+    // Notification test
+    document.getElementById('btnTestNotification').addEventListener('click', async () => {
+      if (!('Notification' in window)) {
+        log('❌ Notifications not supported');
+        return;
+      }
+      
+      const permission = await Notification.requestPermission();
+      log('🔔 Notification permission:', permission);
+      document.getElementById('device-results').innerHTML += `<div>Notifications: ${permission === 'granted' ? '✅' : '❌'} ${permission}</div>`;
+    });
+
+    // Vibration test
+    document.getElementById('btnTestVibration').addEventListener('click', () => {
+      if ('vibrate' in navigator) {
+        navigator.vibrate(200);
+        log('📳 Vibration triggered');
+        document.getElementById('device-results').innerHTML += '<div>Vibration: ✅ Available</div>';
+      } else {
+        log('❌ Vibration not supported');
+        document.getElementById('device-results').innerHTML += '<div>Vibration: ❌ Not supported</div>';
+      }
+    });
+
+    // Storage tests
+    document.getElementById('btnTestLocalStorage').addEventListener('click', () => {
+      try {
+        localStorage.setItem('test', 'value');
+        const value = localStorage.getItem('test');
+        localStorage.removeItem('test');
+        log('🗄️ LocalStorage working:', value);
+        document.getElementById('storage-results').innerHTML += '<div>LocalStorage: ✅ Available</div>';
+      } catch (e) {
+        log('❌ LocalStorage error:', e);
+        document.getElementById('storage-results').innerHTML += '<div>LocalStorage: ❌ Error</div>';
+      }
+    });
+
+    document.getElementById('btnTestSessionStorage').addEventListener('click', () => {
+      try {
+        sessionStorage.setItem('test', 'value');
+        const value = sessionStorage.getItem('test');
+        sessionStorage.removeItem('test');
+        log('🗄️ SessionStorage working:', value);
+        document.getElementById('storage-results').innerHTML += '<div>SessionStorage: ✅ Available</div>';
+      } catch (e) {
+        log('❌ SessionStorage error:', e);
+        document.getElementById('storage-results').innerHTML += '<div>SessionStorage: ❌ Error</div>';
+      }
+    });
+
+    document.getElementById('btnTestIndexedDB').addEventListener('click', () => {
+      if ('indexedDB' in window) {
+        try {
+          const request = indexedDB.open('testDB', 1);
+          request.onsuccess = () => {
+            log('🗄️ IndexedDB available');
+            document.getElementById('storage-results').innerHTML += '<div>IndexedDB: ✅ Available</div>';
+            request.result.close();
+          };
+          request.onerror = (e) => {
+            log('❌ IndexedDB error:', e);
+            document.getElementById('storage-results').innerHTML += '<div>IndexedDB: ❌ Error</div>';
+          };
+        } catch (e) {
+          log('❌ IndexedDB exception:', e);
+          document.getElementById('storage-results').innerHTML += '<div>IndexedDB: ❌ Exception</div>';
+        }
+      } else {
+        log('❌ IndexedDB not supported');
+        document.getElementById('storage-results').innerHTML += '<div>IndexedDB: ❌ Not supported</div>';
+      }
+    });
+
+    // Security tests
+    document.getElementById('btnTestEval').addEventListener('click', () => {
+      try {
+        const result = eval('2 + 2');
+        log('🔒 eval() result:', result);
+        document.getElementById('security-results').innerHTML += '<div>eval(): ⚠️ Allowed</div>';
+      } catch (e) {
+        log('🔒 eval() blocked:', e);
+        document.getElementById('security-results').innerHTML += '<div>eval(): ✅ Blocked</div>';
+      }
+    });
+
+    document.getElementById('btnTestInlineScript').addEventListener('click', () => {
+      try {
+        const script = document.createElement('script');
+        script.textContent = 'console.log("Inline script executed")';
+        document.head.appendChild(script);
+        document.head.removeChild(script);
+        log('🔒 Inline script injection succeeded');
+        document.getElementById('security-results').innerHTML += '<div>Script Injection: ⚠️ Allowed</div>';
+      } catch (e) {
+        log('🔒 Inline script injection blocked:', e);
+        document.getElementById('security-results').innerHTML += '<div>Script Injection: ✅ Blocked</div>';
+      }
+    });
+
+    document.getElementById('btnTestFrameOptions').addEventListener('click', () => {
+      try {
+        const iframe = document.createElement('iframe');
+        iframe.src = 'https://example.com';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        
+        setTimeout(() => {
+          try {
+            document.body.removeChild(iframe);
+            log('🔒 Iframe loading allowed');
+            document.getElementById('security-results').innerHTML += '<div>Iframe Loading: ⚠️ Allowed</div>';
+          } catch (e) {
+            log('🔒 Iframe loading blocked:', e);
+            document.getElementById('security-results').innerHTML += '<div>Iframe Loading: ✅ Blocked</div>';
+          }
+        }, 1000);
+      } catch (e) {
+        log('🔒 Iframe creation blocked:', e);
+        document.getElementById('security-results').innerHTML += '<div>Iframe Loading: ✅ Blocked</div>';
+      }
     });
 
     // Log errori JS in pagina
     window.onerror = (msg, src, line, col, err) => {
       log('‼️ Errore JS:', msg, `at ${src}:${line}:${col}`, err);
     };
+
+    // Log unhandled promise rejections
+    window.addEventListener('unhandledrejection', (e) => {
+      log('‼️ Unhandled Promise Rejection:', e.reason);
+    });
+
+    log('🚀 WebView Security Test initialized');
   </script>
 
 </body>

@@ -59,642 +59,216 @@
     <h2>🧠 Informazioni Ambiente</h2>
     <p><strong>User-Agent:</strong> <span id="ua"></span></p>
     <p><strong>Cookie:</strong> <span id="cookie"></span></p>
-    <p><strong>Referrer:</strong> <span id="referrer"></span></p>
-    <p><strong>Origin:</strong> <span id="origin"></span></p>
-    <p><strong>Protocol:</strong> <span id="protocol"></span></p>
   </div>
 
   <div class="test-section">
     <h2>🛠 JavaScript Bridge Detection</h2>
     <ul>
-      <li id="bridge-android">window.Android: <em>checking...</em></li>
-      <li id="bridge-cordova">window.cordova: <em>checking...</em></li>
-      <li id="bridge-capacitor">window.Capacitor: <em>checking...</em></li>
-      <li id="bridge-plugins">window.plugins: <em>checking...</em></li>
-      <li id="bridge-webkit">window.webkit: <em>checking...</em></li>
       <li id="bridge-external">window.external: <em>checking...</em></li>
+      <li id="bridge-android">window.Android: <em>checking...</em></li>
+      <li id="bridge-webkit">window.webkit: <em>checking...</em></li>
     </ul>
   </div>
 
   <div class="test-section">
-    <h2>⌨️ Input Monitoring Test</h2>
-    <input type="text" placeholder="Test campo testo normale" id="textInput" />
+    <h2>⌨️ Input Test</h2>
+    <input type="text" placeholder="Test campo testo" id="textInput" />
     <input type="password" placeholder="Test campo password" id="passwordInput" />
-    <input type="email" placeholder="test@example.com" id="emailInput" />
-    <input type="tel" placeholder="+39 123 456 7890" id="phoneInput" />
-    <textarea placeholder="Test textarea per testo lungo" id="textareaInput"></textarea>
-  </div>
-
-  <div class="test-section">
-    <h2>🌍 Network & CORS Test</h2>
-    <div id="cors-result">Testing fetch to https://httpbin.org/get...</div>
-    <button id="testXHR">Test XMLHttpRequest</button>
-    <button id="testWebSocket">Test WebSocket</button>
-    <div id="network-results"></div>
-  </div>
-
-  <div class="test-section">
-    <h2>📱 Device API Tests</h2>
-    <button id="btnGetPosition">🌍 Test Geolocation</button>
-    <button id="btnTestCamera">📷 Test Camera Access</button>
-    <button id="btnTestMicrophone">🎤 Test Microphone</button>
-    <button id="btnTestNotification">🔔 Test Notifications</button>
-    <button id="btnTestVibration">📳 Test Vibration</button>
-    <div id="device-results"></div>
-  </div>
-
-  <div class="test-section">
-    <h2>🗄️ Storage Tests</h2>
-    <button id="btnTestLocalStorage">Test LocalStorage</button>
-    <button id="btnTestSessionStorage">Test SessionStorage</button>
-    <button id="btnTestIndexedDB">Test IndexedDB</button>
-    <button id="btnTestWebSQL">Test WebSQL</button>
-    <div id="storage-results"></div>
   </div>
 
   <div class="test-section">
     <h2>🔒 Security Tests</h2>
-    <button id="btnTestCSP">Test Content Security Policy</button>
     <button id="btnTestEval">Test eval() execution</button>
-    <button id="btnTestInlineScript">Test inline script injection</button>
-    <button id="btnTestFrameOptions">Test iframe loading</button>
+    <button id="btnTestScript">Test script injection</button>
+    <button id="btnTestStorage">Test storage</button>
     <div id="security-results"></div>
   </div>
 
   <div class="test-section">
-    <h2>⚠️ Native Bridge Exploitation Tests</h2>
-    <p><strong>⚠️ ATTENZIONE:</strong> Questi test tentano di chiamare funzioni native potenzialmente pericolose!</p>
-    <button id="btnExploreExternal">🔍 Esplora window.external</button>
-    <button id="btnTestCommonMethods">📱 Test metodi comuni Android</button>
-    <button id="btnTestFileAccess">📂 Test accesso file system</button>
-    <button id="btnTestAppInfo">ℹ️ Test informazioni app</button>
-    <button id="btnTestIntents">🚀 Test Android Intents</button>
-    <div id="native-results"></div>
-  </div>
-
-  <div class="test-section">
-    <h2>💀 Exploit Demonstration Tests</h2>
-    <p><strong>⚠️ ATTENZIONE:</strong> Questi test dimostrano exploit reali delle vulnerabilità trovate!</p>
-    <button class="exploit-btn" id="btnExploitEval">💣 Exploit eval() - Codice arbitrario</button>
-    <button class="exploit-btn" id="btnExploitInjection">🧬 Exploit Script Injection</button>
-    <button class="exploit-btn" id="btnExploitIframe">🖼️ Exploit Iframe malevolo</button>
-    <button class="exploit-btn" id="btnExploitStorage">💾 Exploit Storage persistente</button>
-    <button class="exploit-btn" id="btnExploitKeylogger">⌨️ Exploit Keylogger</button>
-    <button class="exploit-btn" id="btnExploitDataTheft">🕵️ Exploit Data theft</button>
+    <h2>💀 Exploit Tests</h2>
+    <button class="exploit-btn" id="btnExploitEval">💣 Test eval()</button>
+    <button class="exploit-btn" id="btnExploitScript">🧬 Test Script Injection</button>
+    <button class="exploit-btn" id="btnExploitStorage">💾 Test Storage</button>
+    <button class="exploit-btn" id="btnExploitKeylogger">⌨️ Test Keylogger</button>
     <div id="exploit-results"></div>
   </div>
 
   <div class="test-section">
     <h2>📜 Console Log</h2>
-    <div class="log" id="log">Log in esecuzione...</div>
+    <div class="log" id="log">Log inizializzato...</div>
   </div>
 
   <script>
-    const logElem = document.getElementById('log');
-    function log(...args) {
-      const timestamp = new Date().toLocaleTimeString();
-      const out = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : a).join(' ');
-      logElem.textContent += `\n[${timestamp}] ${out}`;
+    var logElem = document.getElementById('log');
+    
+    function log() {
+      var args = Array.prototype.slice.call(arguments);
+      var timestamp = new Date().toLocaleTimeString();
+      var out = args.map(function(a) {
+        return typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a);
+      }).join(' ');
+      logElem.textContent += '\n[' + timestamp + '] ' + out;
       logElem.scrollTop = logElem.scrollHeight;
-      console.log(...args);
+      console.log.apply(console, arguments);
     }
 
-    // Pulsante ricarica pagina
-    document.getElementById('reloadBtn').addEventListener('click', () => {
+    // Reload button
+    document.getElementById('reloadBtn').addEventListener('click', function() {
       location.reload();
     });
 
-    // Informazioni ambiente
+    // Environment info
     document.getElementById('ua').textContent = navigator.userAgent;
     document.getElementById('cookie').textContent = document.cookie || "(nessuno)";
-    document.getElementById('referrer').textContent = document.referrer || "(nessuno)";
-    document.getElementById('origin').textContent = window.location.origin;
-    document.getElementById('protocol').textContent = window.location.protocol;
 
     // Bridge detection
-    const bridges = [
-      { name: 'Android', obj: 'window.Android', id: 'bridge-android' },
-      { name: 'cordova', obj: 'window.cordova', id: 'bridge-cordova' },
-      { name: 'Capacitor', obj: 'window.Capacitor', id: 'bridge-capacitor' },
-      { name: 'plugins', obj: 'window.plugins', id: 'bridge-plugins' },
-      { name: 'webkit', obj: 'window.webkit', id: 'bridge-webkit' },
-      { name: 'external', obj: 'window.external', id: 'bridge-external' }
-    ];
-
-    bridges.forEach(bridge => {
-      const obj = eval(bridge.obj);
-      const elem = document.getElementById(bridge.id);
+    function checkBridge(objName, elementId) {
+      var obj = window[objName.split('.')[1]];
+      var elem = document.getElementById(elementId);
       if (obj) {
-        elem.innerHTML = `${bridge.obj}: <span class="status success">✅ presente</span>`;
-        log(`${bridge.obj} rilevato:`, obj);
-        try {
-          if (typeof obj === 'object' && obj.constructor) {
-            log(`${bridge.obj} constructor:`, obj.constructor.name);
-          }
-        } catch (e) {
-          log(`Errore nell'analisi di ${bridge.obj}:`, e);
-        }
+        elem.innerHTML = 'window.' + objName.split('.')[1] + ': <span class="status success">✅ presente</span>';
+        log('Bridge rilevato:', objName, obj);
       } else {
-        elem.innerHTML = `${bridge.obj}: <span class="status error">❌ assente</span>`;
+        elem.innerHTML = 'window.' + objName.split('.')[1] + ': <span class="status error">❌ assente</span>';
       }
-    });
+    }
+
+    checkBridge('window.external', 'bridge-external');
+    checkBridge('window.Android', 'bridge-android'); 
+    checkBridge('window.webkit', 'bridge-webkit');
 
     // Input monitoring
-    ['textInput', 'passwordInput', 'emailInput', 'phoneInput', 'textareaInput'].forEach(id => {
-      const el = document.getElementById(id);
-      el.addEventListener('input', (e) => {
-        log(`Input digitato (${e.target.type || 'textarea'}):`, e.target.value);
-      });
-      el.addEventListener('focus', (e) => {
-        log(`Focus su campo:`, e.target.id);
-      });
-      el.addEventListener('blur', (e) => {
-        log(`Blur da campo:`, e.target.id);
-      });
+    document.getElementById('textInput').addEventListener('input', function(e) {
+      log('Input testo:', e.target.value);
     });
-
-    // Network tests
-    fetch("https://httpbin.org/get", { 
-      method: "GET",
-      headers: { 'Accept': 'application/json' }
-    })
-      .then(r => r.json())
-      .then(data => {
-        document.getElementById('cors-result').innerHTML = `<span class="status success">✅ Fetch successful</span>`;
-        log('Fetch response:', data);
-      })
-      .catch(e => {
-        document.getElementById('cors-result').innerHTML = `<span class="status error">❌ Fetch error: ${e.message}</span>`;
-        log('Fetch error:', e);
-      });
-
-    // XMLHttpRequest test
-    document.getElementById('testXHR').addEventListener('click', () => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', 'https://httpbin.org/user-agent');
-      xhr.onload = () => {
-        log('XHR response:', xhr.responseText);
-        document.getElementById('network-results').innerHTML += '<div>XHR: ✅ Success</div>';
-      };
-      xhr.onerror = (e) => {
-        log('XHR error:', e);
-        document.getElementById('network-results').innerHTML += '<div>XHR: ❌ Error</div>';
-      };
-      xhr.send();
-    });
-
-    // WebSocket test
-    document.getElementById('testWebSocket').addEventListener('click', () => {
-      try {
-        const ws = new WebSocket('wss://echo.websocket.org/');
-        ws.onopen = () => {
-          log('WebSocket opened');
-          ws.send('Test message');
-          document.getElementById('network-results').innerHTML += '<div>WebSocket: ✅ Connected</div>';
-        };
-        ws.onmessage = (e) => {
-          log('WebSocket message:', e.data);
-          ws.close();
-        };
-        ws.onerror = (e) => {
-          log('WebSocket error:', e);
-          document.getElementById('network-results').innerHTML += '<div>WebSocket: ❌ Error</div>';
-        };
-      } catch (e) {
-        log('WebSocket creation error:', e);
-        document.getElementById('network-results').innerHTML += '<div>WebSocket: ❌ Creation Error</div>';
-      }
-    });
-
-    // Device API Tests
-    document.getElementById('btnGetPosition').addEventListener('click', () => {
-      if (!navigator.geolocation) {
-        log("❌ navigator.geolocation non disponibile");
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          log("📍 Posizione ottenuta:", pos.coords);
-          document.getElementById('device-results').innerHTML += '<div>Geolocation: ✅ Granted</div>';
-        },
-        err => {
-          log("❌ Errore posizione:", err);
-          document.getElementById('device-results').innerHTML += '<div>Geolocation: ❌ Denied</div>';
-        }
-      );
-    });
-
-    document.getElementById('btnTestCamera').addEventListener('click', async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        log('📷 Camera access granted');
-        document.getElementById('device-results').innerHTML += '<div>Camera: ✅ Granted</div>';
-        stream.getTracks().forEach(track => track.stop());
-      } catch (e) {
-        log('❌ Camera access denied:', e);
-        document.getElementById('device-results').innerHTML += '<div>Camera: ❌ Denied</div>';
-      }
-    });
-
-    document.getElementById('btnTestMicrophone').addEventListener('click', async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        log('🎤 Microphone access granted');
-        document.getElementById('device-results').innerHTML += '<div>Microphone: ✅ Granted</div>';
-        stream.getTracks().forEach(track => track.stop());
-      } catch (e) {
-        log('❌ Microphone access denied:', e);
-        document.getElementById('device-results').innerHTML += '<div>Microphone: ❌ Denied</div>';
-      }
-    });
-
-    document.getElementById('btnTestNotification').addEventListener('click', async () => {
-      if (!('Notification' in window)) {
-        log('❌ Notifications not supported');
-        return;
-      }
-      const permission = await Notification.requestPermission();
-      log('🔔 Notification permission:', permission);
-      document.getElementById('device-results').innerHTML += `<div>Notifications: ${permission === 'granted' ? '✅' : '❌'} ${permission}</div>`;
-    });
-
-    document.getElementById('btnTestVibration').addEventListener('click', () => {
-      if ('vibrate' in navigator) {
-        navigator.vibrate(200);
-        log('📳 Vibration triggered');
-        document.getElementById('device-results').innerHTML += '<div>Vibration: ✅ Available</div>';
-      } else {
-        log('❌ Vibration not supported');
-        document.getElementById('device-results').innerHTML += '<div>Vibration: ❌ Not supported</div>';
-      }
-    });
-
-    // Storage tests
-    document.getElementById('btnTestLocalStorage').addEventListener('click', () => {
-      try {
-        localStorage.setItem('test', 'value');
-        const value = localStorage.getItem('test');
-        localStorage.removeItem('test');
-        log('🗄️ LocalStorage working:', value);
-        document.getElementById('storage-results').innerHTML += '<div>LocalStorage: ✅ Available</div>';
-      } catch (e) {
-        log('❌ LocalStorage error:', e);
-        document.getElementById('storage-results').innerHTML += '<div>LocalStorage: ❌ Error</div>';
-      }
-    });
-
-    document.getElementById('btnTestSessionStorage').addEventListener('click', () => {
-      try {
-        sessionStorage.setItem('test', 'value');
-        const value = sessionStorage.getItem('test');
-        sessionStorage.removeItem('test');
-        log('🗄️ SessionStorage working:', value);
-        document.getElementById('storage-results').innerHTML += '<div>SessionStorage: ✅ Available</div>';
-      } catch (e) {
-        log('❌ SessionStorage error:', e);
-        document.getElementById('storage-results').innerHTML += '<div>SessionStorage: ❌ Error</div>';
-      }
-    });
-
-    document.getElementById('btnTestIndexedDB').addEventListener('click', () => {
-      if ('indexedDB' in window) {
-        try {
-          const request = indexedDB.open('testDB', 1);
-          request.onsuccess = () => {
-            log('🗄️ IndexedDB available');
-            document.getElementById('storage-results').innerHTML += '<div>IndexedDB: ✅ Available</div>';
-            request.result.close();
-          };
-          request.onerror = (e) => {
-            log('❌ IndexedDB error:', e);
-            document.getElementById('storage-results').innerHTML += '<div>IndexedDB: ❌ Error</div>';
-          };
-        } catch (e) {
-          log('❌ IndexedDB exception:', e);
-          document.getElementById('storage-results').innerHTML += '<div>IndexedDB: ❌ Exception</div>';
-        }
-      } else {
-        log('❌ IndexedDB not supported');
-        document.getElementById('storage-results').innerHTML += '<div>IndexedDB: ❌ Not supported</div>';
-      }
+    
+    document.getElementById('passwordInput').addEventListener('input', function(e) {
+      log('Input password:', e.target.value);
     });
 
     // Security tests
-    document.getElementById('btnTestEval').addEventListener('click', () => {
+    document.getElementById('btnTestEval').addEventListener('click', function() {
       try {
-        const result = eval('2 + 2');
-        log('🔒 eval() result:', result);
-        document.getElementById('security-results').innerHTML += '<div>eval(): ⚠️ Allowed</div>';
+        var result = eval('2 + 2');
+        log('eval() result:', result);
+        document.getElementById('security-results').innerHTML += '<div>eval(): ⚠️ Consentito</div>';
       } catch (e) {
-        log('🔒 eval() blocked:', e);
-        document.getElementById('security-results').innerHTML += '<div>eval(): ✅ Blocked</div>';
+        log('eval() bloccato:', e);
+        document.getElementById('security-results').innerHTML += '<div>eval(): ✅ Bloccato</div>';
       }
     });
 
-    document.getElementById('btnTestInlineScript').addEventListener('click', () => {
+    document.getElementById('btnTestScript').addEventListener('click', function() {
       try {
-        const script = document.createElement('script');
-        script.textContent = 'console.log("Inline script executed")';
+        var script = document.createElement('script');
+        script.textContent = 'console.log("Script iniettato");';
         document.head.appendChild(script);
         document.head.removeChild(script);
-        log('🔒 Inline script injection succeeded');
-        document.getElementById('security-results').innerHTML += '<div>Script Injection: ⚠️ Allowed</div>';
+        log('Script injection riuscita');
+        document.getElementById('security-results').innerHTML += '<div>Script Injection: ⚠️ Consentito</div>';
       } catch (e) {
-        log('🔒 Inline script injection blocked:', e);
-        document.getElementById('security-results').innerHTML += '<div>Script Injection: ✅ Blocked</div>';
+        log('Script injection bloccata:', e);
+        document.getElementById('security-results').innerHTML += '<div>Script Injection: ✅ Bloccato</div>';
       }
     });
 
-    document.getElementById('btnTestFrameOptions').addEventListener('click', () => {
+    document.getElementById('btnTestStorage').addEventListener('click', function() {
       try {
-        const iframe = document.createElement('iframe');
-        iframe.src = 'https://example.com';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        
-        setTimeout(() => {
-          try {
-            document.body.removeChild(iframe);
-            log('🔒 Iframe loading allowed');
-            document.getElementById('security-results').innerHTML += '<div>Iframe Loading: ⚠️ Allowed</div>';
-          } catch (e) {
-            log('🔒 Iframe loading blocked:', e);
-            document.getElementById('security-results').innerHTML += '<div>Iframe Loading: ✅ Blocked</div>';
-          }
-        }, 1000);
+        localStorage.setItem('test', 'valore');
+        var value = localStorage.getItem('test');
+        localStorage.removeItem('test');
+        log('Storage funzionante:', value);
+        document.getElementById('security-results').innerHTML += '<div>Storage: ✅ Disponibile</div>';
       } catch (e) {
-        log('🔒 Iframe creation blocked:', e);
-        document.getElementById('security-results').innerHTML += '<div>Iframe Loading: ✅ Blocked</div>';
+        log('Storage error:', e);
+        document.getElementById('security-results').innerHTML += '<div>Storage: ❌ Errore</div>';
       }
     });
 
-    // Native Bridge Tests
-    document.getElementById('btnExploreExternal').addEventListener('click', () => {
-      log('🔍 === EXPLORING window.external ===');
-      
-      if (window.external) {
-        try {
-          const props = Object.getOwnPropertyNames(window.external);
-          log('📋 window.external properties:', props);
-          
-          props.forEach(prop => {
-            try {
-              const value = window.external[prop];
-              const type = typeof value;
-              log(`  - ${prop}: ${type}`, type === 'function' ? '[FUNCTION]' : value);
-              
-              if (type === 'function') {
-                try {
-                  const result1 = window.external[prop]();
-                  log(`    └─ ${prop}() result:`, result1);
-                } catch (e) {
-                  log(`    └─ ${prop}() error:`, e.message);
-                }
-              }
-            } catch (e) {
-              log(`  - ${prop}: [ACCESS_DENIED]`, e.message);
-            }
-          });
-          
-          document.getElementById('native-results').innerHTML += '<div>window.external: ✅ Explored</div>';
-        } catch (e) {
-          log('❌ Error exploring window.external:', e);
-          document.getElementById('native-results').innerHTML += '<div>window.external: ❌ Error</div>';
-        }
-      } else {
-        log('❌ window.external not available');
-        document.getElementById('native-results').innerHTML += '<div>window.external: ❌ Not available</div>';
-      }
-    });
-
-    document.getElementById('btnTestCommonMethods').addEventListener('click', () => {
-      log('📱 === TESTING COMMON ANDROID METHODS ===');
-      
-      const commonMethods = [
-        'showToast', 'toast', 'alert', 'notify',
-        'openApp', 'launchApp', 'startActivity',
-        'getDeviceInfo', 'getAppVersion', 'getBuildInfo',
-        'readContacts', 'getContacts', 'accessContacts',
-        'makeCall', 'sendSMS', 'dial',
-        'takePicture', 'openCamera', 'capturePhoto',
-        'getLocation', 'getCurrentLocation', 'gps',
-        'writeFile', 'readFile', 'saveFile',
-        'openSettings', 'goToSettings',
-        'minimize', 'close', 'exit', 'finish',
-        'shareContent', 'share',
-        'openBrowser', 'openURL',
-        'getClipboard', 'setClipboard'
-      ];
-
-      const bridges = ['window.external', 'window.Android', 'window.webkit', 'window.cordova'];
-      
-      bridges.forEach(bridgeName => {
-        const bridge = eval(bridgeName);
-        if (bridge) {
-          log(`🌉 Testing bridge: ${bridgeName}`);
-          
-          commonMethods.forEach(method => {
-            try {
-              if (typeof bridge[method] === 'function') {
-                log(`  📞 Found method: ${bridgeName}.${method}`);
-                
-                try {
-                  bridge[method]();
-                  log(`    ✅ ${method}() - Success (no params)`);
-                } catch (e) {
-                  log(`    ❌ ${method}() - Error:`, e.message);
-                }
-                
-                try {
-                  bridge[method]('test');
-                  log(`    ✅ ${method}('test') - Success`);
-                } catch (e) {
-                  log(`    ❌ ${method}('test') - Error:`, e.message);
-                }
-              }
-            } catch (e) {
-              // Silently continue
-            }
-          });
-        }
-      });
-      
-      document.getElementById('native-results').innerHTML += '<div>Common Methods: ✅ Tested</div>';
-    });
-
-    document.getElementById('btnTestFileAccess').addEventListener('click', () => {
-      log('📂 === TESTING FILE SYSTEM ACCESS ===');
-      
-      const filePaths = [
-        '/sdcard/',
-        '/storage/emulated/0/',
-        '/data/data/',
-        '/system/build.prop',
-        '/proc/version',
-        '/etc/hosts',
-        'file:///android_asset/',
-        'content://settings/secure/'
-      ];
-
-      filePaths.forEach(path => {
-        fetch(`file://${path}`)
-          .then(response => {
-            log(`📁 File access to ${path}:`, response.status);
-            if (response.ok) {
-              return response.text();
-            }
-          })
-          .then(text => {
-            if (text) {
-              log(`📄 Content of ${path}:`, text.substring(0, 200));
-            }
-          })
-          .catch(e => {
-            log(`❌ File access to ${path} failed:`, e.message);
-          });
-      });
-
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', 'file:///system/build.prop', true);
-      xhr.onload = () => {
-        log('📁 XHR file access result:', xhr.responseText.substring(0, 200));
-      };
-      xhr.onerror = (e) => {
-        log('❌ XHR file access failed:', e);
-      };
+    // Exploit tests
+    document.getElementById('btnExploitEval').addEventListener('click', function() {
+      log('💣 EXPLOIT: eval() test');
       try {
-        xhr.send();
+        var result = eval('alert("Exploit eval riuscito!"); 5');
+        log('Exploit eval risultato:', result);
+        document.getElementById('exploit-results').innerHTML += '<div style="color: red;">💣 eval(): ✅ EXPLOIT RIUSCITO</div>';
       } catch (e) {
-        log('❌ XHR file access exception:', e);
-      }
-      
-      document.getElementById('native-results').innerHTML += '<div>File Access: ✅ Tested</div>';
-    });
-
-    document.getElementById('btnTestAppInfo').addEventListener('click', () => {
-      log('ℹ️ === TESTING APP INFORMATION LEAKS ===');
-      
-      const infoSources = [
-        'navigator',
-        'window.external',
-        'window.Android',
-        'screen',
-        'history',
-        'location'
-      ];
-
-      infoSources.forEach(sourceName => {
-        const source = eval(sourceName);
-        if (source) {
-          log(`📊 Exploring ${sourceName}:`);
-          
-          try {
-            const props = Object.getOwnPropertyNames(source);
-            props.forEach(prop => {
-              try {
-                const value = source[prop];
-                if (typeof value !== 'function' && value !== null && value !== undefined) {
-                  log(`  - ${sourceName}.${prop}:`, value);
-                }
-              } catch (e) {
-                // Skip restricted properties
-              }
-            });
-          } catch (e) {
-            log(`  ❌ Cannot explore ${sourceName}:`, e.message);
-          }
-        }
-      });
-
-      log('🔗 URL Parameters:', window.location.search);
-      log('🔗 URL Hash:', window.location.hash);
-      log('🔗 Full URL:', window.location.href);
-      
-      document.getElementById('native-results').innerHTML += '<div>App Info: ✅ Collected</div>';
-    });
-
-    document.getElementById('btnTestIntents').addEventListener('click', () => {
-      log('🚀 === TESTING ANDROID INTENTS ===');
-      
-      const intentSchemes = [
-        'tel:+1234567890',
-        'sms:+1234567890',
-        'mailto:test@example.com',
-        'geo:0,0?q=latitude,longitude',
-        'market://details?id=com.example.app',
-        'content://contacts/people/',
-        'http://malicious-site.com',
-        'file:///sdcard/',
-        'intent://example.com#Intent;scheme=http;package=com.android.browser;end'
-      ];
-
-      intentSchemes.forEach(intent => {
-        try {
-          log(`🔗 Testing intent: ${intent}`);
-          
-          const link = document.createElement('a');
-          link.href = intent;
-          link.target = '_blank';
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          
-          setTimeout(() => {
-            try {
-              link.click();
-              log(`  ✅ Intent ${intent} - Click attempted`);
-            } catch (e) {
-              log(`  ❌ Intent ${intent} - Error:`, e.message);
-            } finally {
-              document.body.removeChild(link);
-            }
-          }, 100);
-          
-        } catch (e) {
-          log(`❌ Intent ${intent} failed:`, e.message);
-        }
-      });
-      
-      document.getElementById('native-results').innerHTML += '<div>Android Intents: ✅ Tested</div>';
-    });
-
-    // === EXPLOIT DEMONSTRATION TESTS ===
-    
-    document.getElementById('btnExploitEval').addEventListener('click', () => {
-      log('💣 === EXPLOIT: EVAL() ARBITRARY CODE EXECUTION ===');
-      
-      try {
-        const simpleCode = 'alert("Exploit eval() riuscito!"); 2 + 2';
-        
-        log('💣 Eseguendo: eval("alert + 2+2")');
-        const result = eval(simpleCode);
-        log('💣 Risultato:', result);
-        log('💣 ✅ EXPLOIT RIUSCITO: eval() funziona!');
-        
-        document.getElementById('exploit-results').innerHTML += '<div style="color: red;">💣 eval() Exploit: ✅ SUCCESSO</div>';
-        
-      } catch (e) {
-        log('💣 ❌ Exploit eval() bloccato:', e);
-        document.getElementById('exploit-results').innerHTML += '<div style="color: green;">💣 eval() Exploit: ❌ Bloccato</div>';
+        log('Exploit eval bloccato:', e);
+        document.getElementById('exploit-results').innerHTML += '<div style="color: green;">💣 eval(): ❌ Bloccato</div>';
       }
     });
 
-    document.getElementById('btnExploitInjection').addEventListener('click', () => {
-      log('🧬 === EXPLOIT: SCRIPT INJECTION ===');
-      
+    document.getElementById('btnExploitScript').addEventListener('click', function() {
+      log('🧬 EXPLOIT: Script injection test');
       try {
-        const script = document.createElement('script');
-        script.textContent = 'alert("Script injection riuscita!"); console.log("Iniettato!");';
-        
-        log('🧬 Iniettando script con alert...');
+        var script = document.createElement('script');
+        script.textContent = 'alert("Script exploit riuscito!");';
         document.head.appendChild(script);
-        
-        log('🧬 ✅ EXPLOIT RIUSCITO: Script iniettato!');
-        document.getElementById('exploit-results').innerHTML += '<div style="color: red;">🧬 Script Injection: ✅ SUCCESSO</div>';
-        
-        setTimeout(() => {
+        log('Script exploit eseguito');
+        document.getElementById('exploit-results').innerHTML += '<div style="color: red;">🧬 Script: ✅ EXPLOIT RIUSCITO</div>';
+        setTimeout(function() {
           document.head.removeChild(script);
         }, 1000);
+      } catch (e) {
+        log('Script exploit bloccato:', e);
+        document.getElementById('exploit-results').innerHTML += '<div style="color: green;">🧬 Script: ❌ Bloccato</div>';
+      }
+    });
+
+    document.getElementById('btnExploitStorage').addEventListener('click', function() {
+      log('💾 EXPLOIT: Storage persistence test');
+      try {
+        var maliciousData = {
+          type: 'exploit_data',
+          timestamp: new Date().toISOString(),
+          payload: 'test_payload'
+        };
+        localStorage.setItem('exploit_test', JSON.stringify(maliciousData));
+        var stored = localStorage.getItem('exploit_test');
+        log('Dati exploit memorizzati:', JSON.parse(stored));
+        document.getElementById('exploit-results').innerHTML += '<div style="color: red;">💾 Storage: ✅ EXPLOIT RIUSCITO</div>';
+      } catch (e) {
+        log('Storage exploit bloccato:', e);
+        document.getElementById('exploit-results').innerHTML += '<div style="color: green;">💾 Storage: ❌ Bloccato</div>';
+      }
+    });
+
+    document.getElementById('btnExploitKeylogger').addEventListener('click', function() {
+      log('⌨️ EXPLOIT: Keylogger test');
+      try {
+        var isActive = true;
+        var keylogger = function(e) {
+          if (isActive) {
+            log('Tasto intercettato:', e.target.type, e.target.value);
+          }
+        };
+        
+        var inputs = document.querySelectorAll('input');
+        for (var i = 0; i < inputs.length; i++) {
+          inputs[i].addEventListener('input', keylogger);
+        }
+        
+        log('Keylogger attivato per 10 secondi');
+        document.getElementById('exploit-results').innerHTML += '<div style="color: red;">⌨️ Keylogger: ✅ ATTIVO (10 sec)</div>';
+        
+        setTimeout(function() {
+          isActive = false;
+          log('Keylogger disattivato');
+        }, 10000);
         
       } catch (e) {
-        log('🧬 ❌ Exploit script injection bloccato:', e);
-        document.getElementById('exploit-results').innerHTML += '<div style
+        log('Keylogger bloccato:', e);
+        document.getElementById('exploit-results').innerHTML += '<div style="color: green;">⌨️ Keylogger: ❌ Bloccato</div>';
+      }
+    });
+
+    // Error handling
+    window.onerror = function(msg, src, line) {
+      log('Errore JS:', msg, 'linea ' + line);
+    };
+
+    log('Test di sicurezza WebView inizializzato');
+  </script>
+
+</body>
+</html>

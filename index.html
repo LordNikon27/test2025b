@@ -664,39 +664,10 @@
 
     document.getElementById('btnFuzzing').addEventListener('click', () => {
       log('🎯 === AUTOMATED FUZZING ===');
+      log('⚠️ Fuzzing automatico rimosso per compatibilità mobile');
+      log('💡 Usa gli altri test per esplorare window.external manualmente');
       
-      const payloads = [
-        '', 'null', 'undefined', '0', '1', '-1', 'true', 'false',
-        'test', '../../../etc/passwd', '<script>alert(1)<\/script>',
-        'javascript:alert(1)', 'file:///etc/passwd',
-        '{"test": "value"}', '[1,2,3]', 'function(){return 1;}',
-        '%00', '%2e%2e%2f', String.fromCharCode(0), String.fromCharCode(10, 13, 9)
-      ];
-
-      if (window.external) {
-        const methods = Object.getOwnPropertyNames(window.external)
-          .filter(prop => typeof window.external[prop] === 'function');
-        
-        log(`🎯 Found ${methods.length} methods to fuzz`);
-        
-        methods.forEach(method => {
-          payloads.forEach(payload => {
-            try {
-              const result = window.external[method](payload);
-              if (result !== undefined) {
-                log(`🎯 window.external.${method}('${payload}') = ${result}`);
-              }
-            } catch (e) {
-              // Log only interesting errors
-              if (!e.message.includes('Not enough arguments')) {
-                log(`🎯 window.external.${method}('${payload}') error: ${e.message}`);
-              }
-            }
-          });
-        });
-      }
-      
-      document.getElementById('native-results').innerHTML += '<div>Fuzzing: ✅ Completed</div>';
+      document.getElementById('native-results').innerHTML += '<div>Fuzzing: ⚠️ Disabled for mobile compatibility</div>';
     });
 
     log('🚀 WebView Security Test initialized');

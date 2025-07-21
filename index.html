@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebView Security Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; padding: 1rem; background: #f4f4f4; }
+    textarea { width: 100%; height: 100px; }
+    .log { background: #000; color: #0f0; padding: 1rem; font-family: monospace; white-space: pre-wrap; margin-top: 1rem; border-radius: 8px; }
+    input { width: 100%; padding: 0.5rem; margin: 0.5rem 0; }
+    h2 { margin-top: 2rem; }
+  </style>
+</head>
+<body>
+  <h1>🔍 WebView Security Test</h1>
+
+  <h2>🧠 Ambiente</h2>
+  <p><strong>User-Agent:</strong> <span id="ua"></span></p>
+  <p><strong>Cookie:</strong> <span id="cookie"></span></p>
+
+  <h2>🛠 JavaScript Bridge Check</h2>
+  <p id="bridge-status">Verifica...</p>
+
+  <h2>⌨️ Keylogger Test</h2>
+  <input type="text" placeholder="Inserisci qui un finto numero carta">
+  <input type="password" placeholder="Esempio campo password">
+
+  <h2>🌍 Fetch Test (CORS)</h2>
+  <div id="cors-result">In attesa risposta da https://example.com...</div>
+
+  <h2>📜 Console Log</h2>
+  <div class="log" id="log">Log in esecuzione...</div>
+
+  <script>
+    const log = (...args) => {
+      const out = args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ');
+      document.getElementById('log').textContent += `\n${out}`;
+      console.log(...args);
+    };
+
+    // Mostra user agent e cookie
+    document.getElementById('ua').textContent = navigator.userAgent;
+    document.getElementById('cookie').textContent = document.cookie || "(nessuno)";
+
+    // JavaScript Bridge Check
+    const bridge = window.Android || window.webkit?.messageHandlers;
+    if (bridge) {
+      document.getElementById('bridge-status').textContent = '✅ Bridge JavaScript rilevato!';
+      log('Bridge rilevato:', bridge);
+      try {
+        if (window.Android?.getDeviceInfo) {
+          const info = window.Android.getDeviceInfo();
+          log('Risposta da getDeviceInfo():', info);
+        }
+      } catch (e) {
+        log('Errore chiamando metodo da bridge:', e);
+      }
+    } else {
+      document.getElementById('bridge-status').textContent = '❌ Nessuna bridge JS visibile.';
+    }
+
+    // Keylogger basico
+    document.querySelectorAll('input').forEach(el => {
+      el.addEventListener('input', (e) => {
+        log(`Input digitato in ${e.target.type}:`, e.target.value);
+      });
+    });
+
+    // Test fetch cross-domain (CORS)
+    fetch("https://example.com", { method: "GET" })
+      .then(r => {
+        document.getElementById('cors-result').textContent = `✅ Risposta CORS: ${r.status}`;
+        log('Risposta fetch:', r);
+      })
+      .catch(e => {
+        document.getElementById('cors-result').textContent = `❌ Errore fetch: ${e}`;
+        log('Errore fetch:', e);
+      });
+
+    // Log errori JS
+    window.onerror = (msg, src, line, col, err) => {
+      log('‼️ Errore JS:', msg, `at ${src}:${line}:${col}`, err);
+    };
+  </script>
+</body>
+</html>

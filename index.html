@@ -35,6 +35,18 @@
     .success { color: #28a745; }
     .warning { color: #ffc107; }
     .error { color: #dc3545; }
+    .exploit-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      margin: 0.2rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .exploit-btn:hover {
+      background-color: #c82333;
+    }
   </style>
 </head>
 <body>
@@ -117,8 +129,19 @@
     <button id="btnTestFileAccess">📂 Test accesso file system</button>
     <button id="btnTestAppInfo">ℹ️ Test informazioni app</button>
     <button id="btnTestIntents">🚀 Test Android Intents</button>
-    <button id="btnFuzzing">🎯 Fuzzing automatico</button>
     <div id="native-results"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>💀 Exploit Demonstration Tests</h2>
+    <p><strong>⚠️ ATTENZIONE:</strong> Questi test dimostrano exploit reali delle vulnerabilità trovate!</p>
+    <button class="exploit-btn" id="btnExploitEval">💣 Exploit eval() - Codice arbitrario</button>
+    <button class="exploit-btn" id="btnExploitInjection">🧬 Exploit Script Injection</button>
+    <button class="exploit-btn" id="btnExploitIframe">🖼️ Exploit Iframe malevolo</button>
+    <button class="exploit-btn" id="btnExploitStorage">💾 Exploit Storage persistente</button>
+    <button class="exploit-btn" id="btnExploitKeylogger">⌨️ Exploit Keylogger</button>
+    <button class="exploit-btn" id="btnExploitDataTheft">🕵️ Exploit Data theft</button>
+    <div id="exploit-results"></div>
   </div>
 
   <div class="test-section">
@@ -164,7 +187,6 @@
       if (obj) {
         elem.innerHTML = `${bridge.obj}: <span class="status success">✅ presente</span>`;
         log(`${bridge.obj} rilevato:`, obj);
-        // Prova a chiamare metodi se esistono
         try {
           if (typeof obj === 'object' && obj.constructor) {
             log(`${bridge.obj} constructor:`, obj.constructor.name);
@@ -244,7 +266,7 @@
       }
     });
 
-    // Geolocation test
+    // Device API Tests
     document.getElementById('btnGetPosition').addEventListener('click', () => {
       if (!navigator.geolocation) {
         log("❌ navigator.geolocation non disponibile");
@@ -262,45 +284,40 @@
       );
     });
 
-    // Camera test
     document.getElementById('btnTestCamera').addEventListener('click', async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         log('📷 Camera access granted');
         document.getElementById('device-results').innerHTML += '<div>Camera: ✅ Granted</div>';
-        stream.getTracks().forEach(track => track.stop()); // Stop stream
+        stream.getTracks().forEach(track => track.stop());
       } catch (e) {
         log('❌ Camera access denied:', e);
         document.getElementById('device-results').innerHTML += '<div>Camera: ❌ Denied</div>';
       }
     });
 
-    // Microphone test
     document.getElementById('btnTestMicrophone').addEventListener('click', async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         log('🎤 Microphone access granted');
         document.getElementById('device-results').innerHTML += '<div>Microphone: ✅ Granted</div>';
-        stream.getTracks().forEach(track => track.stop()); // Stop stream
+        stream.getTracks().forEach(track => track.stop());
       } catch (e) {
         log('❌ Microphone access denied:', e);
         document.getElementById('device-results').innerHTML += '<div>Microphone: ❌ Denied</div>';
       }
     });
 
-    // Notification test
     document.getElementById('btnTestNotification').addEventListener('click', async () => {
       if (!('Notification' in window)) {
         log('❌ Notifications not supported');
         return;
       }
-      
       const permission = await Notification.requestPermission();
       log('🔔 Notification permission:', permission);
       document.getElementById('device-results').innerHTML += `<div>Notifications: ${permission === 'granted' ? '✅' : '❌'} ${permission}</div>`;
     });
 
-    // Vibration test
     document.getElementById('btnTestVibration').addEventListener('click', () => {
       if ('vibrate' in navigator) {
         navigator.vibrate(200);
@@ -411,22 +428,11 @@
       }
     });
 
-    // Log errori JS in pagina
-    window.onerror = (msg, src, line, col, err) => {
-      log('‼️ Errore JS:', msg, `at ${src}:${line}:${col}`, err);
-    };
-
-    // Log unhandled promise rejections
-    window.addEventListener('unhandledrejection', (e) => {
-      log('‼️ Unhandled Promise Rejection:', e.reason);
-    });
-
-    // Native Bridge Exploitation Tests
+    // Native Bridge Tests
     document.getElementById('btnExploreExternal').addEventListener('click', () => {
       log('🔍 === EXPLORING window.external ===');
       
       if (window.external) {
-        // Esplora tutte le proprietà e metodi
         try {
           const props = Object.getOwnPropertyNames(window.external);
           log('📋 window.external properties:', props);
@@ -438,9 +444,7 @@
               log(`  - ${prop}: ${type}`, type === 'function' ? '[FUNCTION]' : value);
               
               if (type === 'function') {
-                // Prova a chiamare con parametri comuni
                 try {
-                  // Test con parametri vuoti
                   const result1 = window.external[prop]();
                   log(`    └─ ${prop}() result:`, result1);
                 } catch (e) {
@@ -467,7 +471,6 @@
       log('📱 === TESTING COMMON ANDROID METHODS ===');
       
       const commonMethods = [
-        // Metodi Android comuni
         'showToast', 'toast', 'alert', 'notify',
         'openApp', 'launchApp', 'startActivity',
         'getDeviceInfo', 'getAppVersion', 'getBuildInfo',
@@ -483,7 +486,6 @@
         'getClipboard', 'setClipboard'
       ];
 
-      // Testa su tutti i possibili bridge
       const bridges = ['window.external', 'window.Android', 'window.webkit', 'window.cordova'];
       
       bridges.forEach(bridgeName => {
@@ -496,7 +498,6 @@
               if (typeof bridge[method] === 'function') {
                 log(`  📞 Found method: ${bridgeName}.${method}`);
                 
-                // Prova chiamate con parametri diversi
                 try {
                   bridge[method]();
                   log(`    ✅ ${method}() - Success (no params)`);
@@ -535,7 +536,6 @@
         'content://settings/secure/'
       ];
 
-      // Test fetch con file: protocol
       filePaths.forEach(path => {
         fetch(`file://${path}`)
           .then(response => {
@@ -554,7 +554,6 @@
           });
       });
 
-      // Test con XMLHttpRequest
       const xhr = new XMLHttpRequest();
       xhr.open('GET', 'file:///system/build.prop', true);
       xhr.onload = () => {
@@ -575,7 +574,6 @@
     document.getElementById('btnTestAppInfo').addEventListener('click', () => {
       log('ℹ️ === TESTING APP INFORMATION LEAKS ===');
       
-      // Test proprietà disponibili
       const infoSources = [
         'navigator',
         'window.external',
@@ -608,7 +606,6 @@
         }
       });
 
-      // Test URL parameters
       log('🔗 URL Parameters:', window.location.search);
       log('🔗 URL Hash:', window.location.hash);
       log('🔗 Full URL:', window.location.href);
@@ -633,10 +630,8 @@
 
       intentSchemes.forEach(intent => {
         try {
-          // Testa con window.open
           log(`🔗 Testing intent: ${intent}`);
           
-          // Crea link nascosto e prova a cliccare
           const link = document.createElement('a');
           link.href = intent;
           link.target = '_blank';
@@ -662,16 +657,44 @@
       document.getElementById('native-results').innerHTML += '<div>Android Intents: ✅ Tested</div>';
     });
 
-    document.getElementById('btnFuzzing').addEventListener('click', () => {
-      log('🎯 === AUTOMATED FUZZING ===');
-      log('⚠️ Fuzzing automatico rimosso per compatibilità mobile');
-      log('💡 Usa gli altri test per esplorare window.external manualmente');
+    // === EXPLOIT DEMONSTRATION TESTS ===
+    
+    document.getElementById('btnExploitEval').addEventListener('click', () => {
+      log('💣 === EXPLOIT: EVAL() ARBITRARY CODE EXECUTION ===');
       
-      document.getElementById('native-results').innerHTML += '<div>Fuzzing: ⚠️ Disabled for mobile compatibility</div>';
+      try {
+        const simpleCode = 'alert("Exploit eval() riuscito!"); 2 + 2';
+        
+        log('💣 Eseguendo: eval("alert + 2+2")');
+        const result = eval(simpleCode);
+        log('💣 Risultato:', result);
+        log('💣 ✅ EXPLOIT RIUSCITO: eval() funziona!');
+        
+        document.getElementById('exploit-results').innerHTML += '<div style="color: red;">💣 eval() Exploit: ✅ SUCCESSO</div>';
+        
+      } catch (e) {
+        log('💣 ❌ Exploit eval() bloccato:', e);
+        document.getElementById('exploit-results').innerHTML += '<div style="color: green;">💣 eval() Exploit: ❌ Bloccato</div>';
+      }
     });
 
-    log('🚀 WebView Security Test initialized');
-  </script>
-
-</body>
-</html>
+    document.getElementById('btnExploitInjection').addEventListener('click', () => {
+      log('🧬 === EXPLOIT: SCRIPT INJECTION ===');
+      
+      try {
+        const script = document.createElement('script');
+        script.textContent = 'alert("Script injection riuscita!"); console.log("Iniettato!");';
+        
+        log('🧬 Iniettando script con alert...');
+        document.head.appendChild(script);
+        
+        log('🧬 ✅ EXPLOIT RIUSCITO: Script iniettato!');
+        document.getElementById('exploit-results').innerHTML += '<div style="color: red;">🧬 Script Injection: ✅ SUCCESSO</div>';
+        
+        setTimeout(() => {
+          document.head.removeChild(script);
+        }, 1000);
+        
+      } catch (e) {
+        log('🧬 ❌ Exploit script injection bloccato:', e);
+        document.getElementById('exploit-results').innerHTML += '<div style

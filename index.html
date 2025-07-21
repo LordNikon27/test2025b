@@ -88,7 +88,8 @@
     <h2>💀 Exploit Tests</h2>
     <button class="exploit-btn" id="btnExploitEval">💣 Test eval()</button>
     <button class="exploit-btn" id="btnExploitScript">🧬 Test Script Injection</button>
-    <button class="exploit-btn" id="btnExploitStorage">💾 Test Storage</button>
+    <button class="exploit-btn" id="btnExploitStorage">💾 Nascondi dati malevoli</button>
+    <button class="exploit-btn" id="btnCheckStorage">🔍 Verifica dati nascosti</button>
     <button class="exploit-btn" id="btnExploitKeylogger">⌨️ Test Keylogger</button>
     <div id="exploit-results"></div>
   </div>
@@ -216,20 +217,51 @@
     });
 
     document.getElementById('btnExploitStorage').addEventListener('click', function() {
-      log('💾 EXPLOIT: Storage persistence test');
+      log('💾 EXPLOIT: Nascondendo dati malevoli...');
       try {
         var maliciousData = {
           type: 'exploit_data',
           timestamp: new Date().toISOString(),
-          payload: 'test_payload'
+          payload: 'codice_malevolo_nascosto',
+          attacker_id: 'hacker_001',
+          target: 'user_data'
         };
         localStorage.setItem('exploit_test', JSON.stringify(maliciousData));
+        localStorage.setItem('malicious_payload', 'eval("alert(\'Sono ancora qui!\')")');
+        
         var stored = localStorage.getItem('exploit_test');
-        log('Dati exploit memorizzati:', JSON.parse(stored));
-        document.getElementById('exploit-results').innerHTML += '<div style="color: red;">💾 Storage: ✅ EXPLOIT RIUSCITO</div>';
+        log('💾 Dati malevoli nascosti con successo:', JSON.parse(stored));
+        document.getElementById('exploit-results').innerHTML += '<div style="color: red;">💾 Storage: ✅ DATI MALEVOLI NASCOSTI</div>';
+        alert('Dati malevoli nascosti! Usa il pulsante "Verifica" per controllare se sono ancora lì.');
       } catch (e) {
         log('Storage exploit bloccato:', e);
         document.getElementById('exploit-results').innerHTML += '<div style="color: green;">💾 Storage: ❌ Bloccato</div>';
+      }
+    });
+
+    document.getElementById('btnCheckStorage').addEventListener('click', function() {
+      log('🔍 VERIFICA: Controllando se i dati malevoli sono ancora presenti...');
+      try {
+        var exploitData = localStorage.getItem('exploit_test');
+        var maliciousPayload = localStorage.getItem('malicious_payload');
+        
+        if (exploitData) {
+          log('🚨 TROVATI dati malevoli persistenti:', JSON.parse(exploitData));
+          document.getElementById('exploit-results').innerHTML += '<div style="color: red;">🔍 Verifica: ⚠️ DATI MALEVOLI ANCORA PRESENTI!</div>';
+          alert('ATTENZIONE: I dati malevoli sono ancora qui! Anche dopo aver ricaricato la pagina.');
+        } else {
+          log('✅ Nessun dato malevolo trovato');
+          document.getElementById('exploit-results').innerHTML += '<div style="color: green;">🔍 Verifica: ✅ Nessun dato trovato</div>';
+          alert('Nessun dato malevolo trovato nello storage.');
+        }
+        
+        if (maliciousPayload) {
+          log('💣 TROVATO payload malevolo:', maliciousPayload);
+          alert('TROVATO anche un payload malevolo che potrebbe essere eseguito!');
+        }
+        
+      } catch (e) {
+        log('Errore nella verifica:', e);
       }
     });
 

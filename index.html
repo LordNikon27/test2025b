@@ -10,9 +10,25 @@
     .log { background: #222; color: #0f0; padding: 1rem; font-family: monospace; white-space: pre-wrap; height: 250px; overflow-y: auto; border-radius: 6px; }
     h2 { margin-top: 1.8rem; }
     button { cursor: pointer; }
+    #reloadBtn {
+      width: auto;
+      padding: 0.4rem 1rem;
+      font-weight: bold;
+      font-size: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+    }
+    #reloadBtn:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
+
+  <button id="reloadBtn">🔄 Ricarica pagina</button>
 
   <h1>🔍 WebView Advanced Security Test</h1>
 
@@ -49,6 +65,11 @@
       logElem.scrollTop = logElem.scrollHeight;
       console.log(...args);
     }
+
+    // Pulsante ricarica pagina
+    document.getElementById('reloadBtn').addEventListener('click', () => {
+      location.reload();
+    });
 
     // Mostra user agent e cookie
     document.getElementById('ua').textContent = navigator.userAgent;
